@@ -27,7 +27,6 @@ class CustomerUser(AbstractUser):
     email = models.EmailField(unique=True)  # must be unique for login
 
     phone_number = models.CharField(max_length=15)
-    row_password = models.TextField(null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []  # ✅ DO NOT put 'email' here
