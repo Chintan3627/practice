@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_DIR = '/home/ubuntu/practice/practice_deployment' // Already cloned repo path
+        VENV = '/home/ubuntu/practice/venv'                    // Virtualenv path
+    }
+
+    stages {
+        stage('Pull Latest Code') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                        echo "Pulling latest changes from GitHub..."
+                        git reset --hard
+                        git pull origin main
+                    '''
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                        echo "Activating virtualenv and installing dependencies..."
+                        source ${VENV}/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    '''
+                }
+            }
+        }
+
+        stage('Restart Services') {
+            steps {
+                sh '''
+                    echo "Restarting Gunicorn and Nginx..."
+                    sudo systemctl restart gunicorn
+                    sudo systemctl restart nginx
+                '''
+            }
+        }
+    }
+}
